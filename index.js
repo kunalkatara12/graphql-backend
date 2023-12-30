@@ -6,19 +6,19 @@ import axios from "axios";
 async function startApolloServer() {
   const server = new ApolloServer({
     typeDefs: `
-    type User{
-        id:ID!
-        name:String!
-        username:String!
-        email:String!
-        phone:String!
-        website:String!
-
-    }
+        type User{
+            id:ID!
+            name:String!
+            username:String!
+            email:String!
+            phone:String!
+            website:String!
+        }
         type Todo{
             id:ID!
             title:String!
             completed:Boolean
+            user:User
         }
         type Query{
             getTodos:[Todo]
@@ -27,6 +27,13 @@ async function startApolloServer() {
         }
         `,
     resolvers: {
+      Todo: {
+        user: async (parent) => {
+          return await axios
+            .get(`https://jsonplaceholder.typicode.com/users/${parent.userId}`)
+            .then((res) => res.data);
+        },
+      },
       Query: {
         getTodos: async () => {
           return await axios
